@@ -76,10 +76,12 @@ AddEventHandler('esx_joblisting:setSecJob', function(setJob)
 				xPlayer.setJob(setJob, 0)
 				MySQL.scalar('SELECT secJob FROM sec_jobs WHERE identifier = ?', {xPlayer.identifier},
 				function(getIsHaveSecJob)
-					if getIsHaveSecJob ~= nil then
+					if getIsHaveSecJob == 'nil' then
+						MySQL.Sync.execute('UPDATE sec_jobs SET secJob = @secJob, secJobLabel = @secJobLabel WHERE identifier = @identifier', {['@identifier'] = xPlayer.identifier, ['@secJob'] = setJob, ['@secJobLabel'] = v.label})
+					elseif getIsHaveSecJob ~= nil then
 						MySQL.Sync.execute('UPDATE sec_jobs SET secJob = @secJob, secJobLabel = @secJobLabel WHERE identifier = @identifier', {['@identifier'] = xPlayer.identifier, ['@secJob'] = setJob, ['@secJobLabel'] = v.label})
 					else
-						MySQL.insert('INSERT INTO sec_jobs (identifier, firstJob, secJob, secJobLabel) VALUES (?, ?, ?, ?)', {xPlayer.identifier, false, setJob, v.label}, function(rowsChanged)if cb then end end)
+						MySQL.insert('INSERT INTO sec_jobs (identifier, firstJob, secJob, secJobLabel) VALUES (?, ?, ?, ?)', {xPlayer.identifier, 'nil', setJob, v.label}, function(rowsChanged)if cb then end end)
 					end
 				end)
 				MySQL.prepare("UPDATE `users` SET `job` = ? WHERE `identifier` = ?", parameters, function(results)if results then end end)
@@ -109,10 +111,12 @@ AddEventHandler('esx_joblisting:setFirstJob', function(setJob, jobGrade)
 			if v.job == setJob then
 				MySQL.scalar('SELECT firstJob FROM sec_jobs WHERE identifier = ?', {xPlayer.identifier},
 				function(getIsHaveSecJob)
-					if getIsHaveSecJob ~= nil then
+					if getIsHaveSecJob == 'nil' then
+						MySQL.Sync.execute('UPDATE sec_jobs SET firstJob = @firstJob, firstJobLabel = @firstJobLabel, firstGrade = @firstGrade WHERE identifier = @identifier', {['@identifier'] = xPlayer.identifier, ['@firstJob'] = setJob, ['@firstJobLabel'] = v.label, ['@firstGrade'] = jobGrade})
+					elseif getIsHaveSecJob ~= nil then
 						MySQL.Sync.execute('UPDATE sec_jobs SET firstJob = @firstJob, firstJobLabel = @firstJobLabel, firstGrade = @firstGrade WHERE identifier = @identifier', {['@identifier'] = xPlayer.identifier, ['@firstJob'] = setJob, ['@firstJobLabel'] = v.label, ['@firstGrade'] = jobGrade})
 					else
-						MySQL.insert('INSERT INTO sec_jobs (identifier, firstJob, firstJobLabel, firstGrade) VALUES (?, ?, ?, ?)', {xPlayer.identifier, setJob, v.label, jobGrade}, function(rowsChanged)if cb then end end)
+						MySQL.insert('INSERT INTO sec_jobs (identifier, firstJob, firstJobLabel, firstGrade, secJob) VALUES (?, ?, ?, ?, ?)', {xPlayer.identifier, setJob, v.label, jobGrade, 'nil'}, function(rowsChanged)if cb then end end)
 					end
 				end)
 				MySQL.prepare("UPDATE `users` SET `job` = ? WHERE `identifier` = ?", parameters, function(results)if results then end end)
@@ -120,10 +124,12 @@ AddEventHandler('esx_joblisting:setFirstJob', function(setJob, jobGrade)
 			elseif setJob == 'unemployed' then
 				MySQL.scalar('SELECT firstJob FROM sec_jobs WHERE identifier = ?', {xPlayer.identifier},
 				function(getIsHaveSecJob)
-					if getIsHaveSecJob ~= nil then
+					if getIsHaveSecJob == 'nil' then
+						MySQL.Sync.execute('UPDATE sec_jobs SET firstJob = @firstJob, firstJobLabel = @firstJobLabel, firstGrade = @firstGrade WHERE identifier = @identifier', {['@identifier'] = xPlayer.identifier, ['@firstJob'] = setJob, ['@firstJobLabel'] = "Warga", ['@firstGrade'] = jobGrade})
+					elseif getIsHaveSecJob ~= nil then
 						MySQL.Sync.execute('UPDATE sec_jobs SET firstJob = @firstJob, firstJobLabel = @firstJobLabel, firstGrade = @firstGrade WHERE identifier = @identifier', {['@identifier'] = xPlayer.identifier, ['@firstJob'] = setJob, ['@firstJobLabel'] = "Warga", ['@firstGrade'] = jobGrade})
 					else
-						MySQL.insert('INSERT INTO sec_jobs (identifier, firstJob, firstJobLabel, firstGrade) VALUES (?, ?, ?, ?)', {xPlayer.identifier, setJob, "Warga", jobGrade}, function(rowsChanged)if cb then end end)
+						MySQL.insert('INSERT INTO sec_jobs (identifier, firstJob, firstJobLabel, firstGrade, secJob) VALUES (?, ?, ?, ?, ?)', {xPlayer.identifier, setJob, "Warga", jobGrade, 'nil'}, function(rowsChanged)if cb then end end)
 					end
 				end)
 				MySQL.prepare("UPDATE `users` SET `job` = ? WHERE `identifier` = ?", parameters, function(results)if results then end end)
@@ -133,45 +139,13 @@ AddEventHandler('esx_joblisting:setFirstJob', function(setJob, jobGrade)
 	end
 end)
 
---[[
-	if v1.job == "unemployed" then
-	for k2,v2 in ipairs(haveFirstJob) do
-		if v2.hasJob == nil then
-			MySQL.insert('INSERT INTO sec_jobs (identifier, secJob, hasJob) VALUES (?, ?, ?)', {xPlayer.identifier, setJob, 1},
-			function(rowsChanged)
-				if cb then
-					print(v1.job)
-					print(setJob)
-					cb()
-				end
-			end)
-			break
-		else
-			MySQL.Sync.execute('UPDATE sec_jobs SET secJob = @secJob WHERE identifier = @identifier', {
-				['@identifier'] = xPlayer.identifier,
-				['@secJob'] = setJob
-			})
-			break
-		end
-	end
-else
-	MySQL.Sync.execute('UPDATE sec_jobs SET secJob = @secJob WHERE identifier = @identifier', {
-		['@identifier'] = xPlayer.identifier,
-		['@secJob'] = setJob
-	})
-	break
-end
-
-for k1,v1 in ipairs(haveJob) do
-	if v1.job == "unemployed" then
-		
-		break
+RegisterServerEvent('esx_joblisting:setJobFromButton')
+AddEventHandler('esx_joblisting:setJobFromButton', function(setJob, jobGrade, isFirst)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	if isFirst then
+		xPlayer.setJob(setJob, jobGrade)
 	else
-		MySQL.Sync.execute('UPDATE sec_jobs SET secJob = @secJob WHERE identifier = @identifier', {
-			['@identifier'] = xPlayer.identifier,
-			['@secJob'] = setJob
-		})
-		break
+		xPlayer.setJob(setJob, jobGrade)
 	end
-end
-]]
+	TriggerClientEvent('skd_cSide:forServerNotify', -1, 'success', "Mengganti kerjaan")
+end)

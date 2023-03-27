@@ -18,9 +18,11 @@ end)
 
 RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(job)
-	if job.name == 'unemployed' or job.name == 'ambulance' or job.name == 'offambulance' or job.name == 'police' or job.name == 'offpolice' or job.name == 'mechanic' or job.name == 'offmechanic' then
-		TriggerServerEvent('esx_joblisting:setFirstJob', job.name, job.grade)
-		--print(job.name.." - "..job.label.." - "..job.grade)
+	for i=1, #Config.whitelistedJobs, 1 do
+		if job.name == Config.whitelistedJobs[i] then
+			TriggerServerEvent('esx_joblisting:setFirstJob', job.name, job.grade)
+			--print(job.name.." - "..job.label.." - "..job.grade)
+		end
 	end
 end)
 
@@ -124,15 +126,16 @@ function openChangeJobs(tempopen)
 			for i=1, #hasJobs, 1 do
 				SendNUIMessage({
 					action = tempopen;
+					firstJobName = hasJobs[i].firstJob;
 					firstJob = hasJobs[i].firstJobLabel;
+					firstGrade = hasJobs[i].firstGrade;
+					secJobName = hasJobs[i].secJob;
 					secJob = hasJobs[i].secJobLabel;
 				})
 			end
 		else
 			SendNUIMessage({
 				action = tempopen;
-				firstJob = nil;
-				secJob = nil;
 			})
 		end
 		
@@ -155,6 +158,18 @@ RegisterNUICallback('cJobs', function(data, cb)
     -- Clear focus and destroy UI
     open = false
 	openChangeJobs(open)
+end)
+
+RegisterNUICallback('setFirstJobs', function(data, cb)
+    -- Clear focus and destroy UI
+	--print(data.jobsName.." - "..data.jobsGrade)
+	TriggerServerEvent('esx_joblisting:setJobFromButton', data.jobsName, data.jobsGrade, true)
+end)
+
+RegisterNUICallback('setSecJobs', function(data, cb)
+    -- Clear focus and destroy UI
+	--print(data.jobsName)
+	TriggerServerEvent('esx_joblisting:setJobFromButton', data.jobsName, 0, false)
 end)
 
 RegisterKeyMapping('cJobs', 'Open Change Jobs', 'keyboard', 'F6')
