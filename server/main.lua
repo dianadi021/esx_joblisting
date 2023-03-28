@@ -140,12 +140,14 @@ AddEventHandler('esx_joblisting:setFirstJob', function(setJob, jobGrade)
 end)
 
 RegisterServerEvent('esx_joblisting:setJobFromButton')
-AddEventHandler('esx_joblisting:setJobFromButton', function(setJob, jobGrade, isFirst)
+AddEventHandler('esx_joblisting:setJobFromButton', function(setJob, jobGrade)
 	local xPlayer = ESX.GetPlayerFromId(source)
-	if isFirst then
-		xPlayer.setJob(setJob, jobGrade)
+	if setJob == 'firstJobsName' then
+		TriggerClientEvent('skd_cSide:forServerNotify', -1, 'error', "Blum ada kerjaan utama")
+	elseif setJob == 'secJobsName' then
+		TriggerClientEvent('skd_cSide:forServerNotify', -1, 'error', "Blum ada kerjaan sampingan")
 	else
 		xPlayer.setJob(setJob, jobGrade)
+		TriggerClientEvent('skd_cSide:forServerNotify', -1, 'success', "Berhasil mengganti kerjaan")
 	end
-	TriggerClientEvent('skd_cSide:forServerNotify', -1, 'success', "Mengganti kerjaan")
 end)

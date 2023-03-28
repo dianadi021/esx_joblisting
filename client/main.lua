@@ -163,13 +163,13 @@ end)
 RegisterNUICallback('setFirstJobs', function(data, cb)
     -- Clear focus and destroy UI
 	--print(data.jobsName.." - "..data.jobsGrade)
-	TriggerServerEvent('esx_joblisting:setJobFromButton', data.jobsName, data.jobsGrade, true)
+	TriggerServerEvent('esx_joblisting:setJobFromButton', data.jobsName, data.jobsGrade)
 end)
 
 RegisterNUICallback('setSecJobs', function(data, cb)
     -- Clear focus and destroy UI
 	--print(data.jobsName)
-	TriggerServerEvent('esx_joblisting:setJobFromButton', data.jobsName, 0, false)
+	TriggerServerEvent('esx_joblisting:setJobFromButton', data.jobsName, 0)
 end)
 
 RegisterKeyMapping('cJobs', 'Open Change Jobs', 'keyboard', 'F6')
