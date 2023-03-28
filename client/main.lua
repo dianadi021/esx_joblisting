@@ -169,6 +169,9 @@ end)
 RegisterNUICallback('setSecJobs', function(data, cb)
     -- Clear focus and destroy UI
 	--print(data.jobsName)
+	ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin)
+		TriggerEvent('skinchanger:loadSkin', skin)
+	end)
 	TriggerServerEvent('esx_joblisting:setJobFromButton', data.jobsName, 0)
 end)
 

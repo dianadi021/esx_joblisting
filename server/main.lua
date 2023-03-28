@@ -91,8 +91,7 @@ AddEventHandler('esx_joblisting:setSecJob', function(setJob)
 	end
 end)
 
-RegisterServerEvent('esx_joblisting:setFirstJob')
-AddEventHandler('esx_joblisting:setFirstJob', function(setJob, jobGrade)
+function setFirstJobSQL(setJob, jobGrade)
 	local xPlayer = ESX.GetPlayerFromId(source)
 
 	local _xPlayers = ESX.GetExtendedPlayers()
@@ -137,6 +136,11 @@ AddEventHandler('esx_joblisting:setFirstJob', function(setJob, jobGrade)
 			end
 		end
 	end
+end
+
+RegisterServerEvent('esx_joblisting:setFirstJob')
+AddEventHandler('esx_joblisting:setFirstJob', function(setJob, jobGrade)
+	setFirstJobSQL(setJob, jobGrade)
 end)
 
 RegisterServerEvent('esx_joblisting:setJobFromButton')

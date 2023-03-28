@@ -4,6 +4,8 @@ Config.whitelistedJobs = {
 	"unemployed",
 	"ambulance",
 	"offambulance",
+	"banker",
+	"offbanker",
 	"police",
 	"offpolice",
 	"mechanic",
