@@ -1,6 +1,5 @@
 local availableJobs = {}
 local availableJobsWhitelisted = {}
-local haveSecJob = {}
 
 MySQL.ready(function()
 	MySQL.query('SELECT name, label FROM jobs WHERE whitelisted = @whitelisted', {
@@ -33,6 +32,7 @@ ESX.RegisterServerCallback('esx_joblisting:getJobsList', function(source, cb)
 end)
 
 ESX.RegisterServerCallback('esx_joblisting:haveSecJob', function(source, cb)
+	local haveSecJob = {}
 	local xPlayer = ESX.GetPlayerFromId(source)
 	MySQL.query('SELECT identifier, firstJob, firstJobLabel, firstGrade, secJob, secJobLabel FROM sec_jobs WHERE identifier = @identifier', {
 		['@identifier'] = xPlayer.identifier
